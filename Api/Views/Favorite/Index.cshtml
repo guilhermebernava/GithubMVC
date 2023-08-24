@@ -1,0 +1,56 @@
+﻿@model GithubViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Favorites</title>
+    <link rel="stylesheet" href="~/css/repositories.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.likeButton').click(function () {
+                $(this).toggleClass('liked');
+                var isLiked = $(this).hasClass('liked');
+                this.innerText = isLiked ? "DESLIKE" : "LIKE";
+                var repo = $(this).data('repo');
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("Like", "MyRepositories")',
+                    data: { repoName: repo },
+                    success: function (data) {
+                        console.log(repo);
+                    },
+                    error: function (error) {
+                        console.error(error);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="center-div">
+        <ul>
+            @foreach (var repo in Model.Repositories)
+            {
+                <li data-repo-name="@repo.Name" class="repo-item">
+                    <div class="repo-container">
+                        <a href="@repo.Url" target="_blank">
+                            <h2>@repo.Name</h2>
+                            <div>
+                                <h4 class="d-inline">Language: </h4>
+                                <b><span>@repo.Language</span></b>
+                            </div>
+                            <h4>Description:</h4>
+                            <p>@repo.Description</p>
+                        </a>
+                        <button class="likeButton liked" data-repo="@repo.Name">
+                            <text>DESLIKE</text>
+                        </button>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</body>
+</html>

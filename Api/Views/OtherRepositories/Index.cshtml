@@ -1,0 +1,105 @@
+﻿@model GithubViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Others Repositories</title>
+    <link rel="stylesheet" href="~/css/repositories.css" />
+</head>
+<body>
+    <div class="center-div">
+        <h1 class="display-4">Others Repositories</h1>
+        @Html.TextBoxFor(_ => _.UserName, new { @oninput = "search(this.value);" })
+        <div id="userRepositories"></div>
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+    function renderRepository(repo) {
+        var li = document.createElement('li');
+        li.setAttribute('data-repo-name', repo.name);
+        li.className = 'repo-item';
+
+        var a = document.createElement('a');
+        a.href = repo.url;
+        a.target = '_blank';
+
+        var div = document.createElement('div');
+        div.className = 'repo-container';
+
+        var username = document.createElement('h2');
+        username.textContent = 'Username: ' + repo.login;
+
+        var h2 = document.createElement('h2');
+        h2.textContent = repo.name;
+
+        var languageDiv = document.createElement('div');
+        var h4 = document.createElement('h4');
+        h4.className = 'd-inline';
+        h4.textContent = 'Language: ';
+        var b = document.createElement('b');
+        var span = document.createElement('span');
+        span.textContent = repo.language;
+        b.appendChild(span);
+        languageDiv.appendChild(h4);
+        languageDiv.appendChild(b);
+
+        var descriptionH4 = document.createElement('h4');
+        descriptionH4.textContent = 'Description:';
+
+        var descriptionP = document.createElement('p');
+        descriptionP.textContent = repo.description;
+
+        div.appendChild(username);
+        div.appendChild(h2);
+        div.appendChild(languageDiv);
+        div.appendChild(descriptionH4);
+        div.appendChild(descriptionP);
+
+        a.appendChild(div);
+        li.appendChild(a);
+
+        return li;
+    }
+
+    function search(value) {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("Search", "OtherRepositories")',
+            data: { value: value },
+            success: function (data) {
+                console.log(data);
+                var repositoriesList = document.getElementById('userRepositories');
+                repositoriesList.innerHTML = '';
+
+                for (var i = 0; i < data.repositories.length; i++) {
+                    var repo = data.repositories[i];
+                    var li = renderRepository(repo);
+                    repositoriesList.appendChild(li);
+                }
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $('.likeButton').click(function () {
+            $(this).toggleClass('liked');
+            var repo = $(this).data('repo');
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Like", "MyRepositories")',
+                data: { repoName: repo },
+                success: function (data) {
+                    console.log(repo);
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        });
+    });
+</script>

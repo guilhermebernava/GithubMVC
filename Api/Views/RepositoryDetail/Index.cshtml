@@ -1,0 +1,25 @@
+﻿@using Api.Dtos;
+@model RepositoryDto
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@Model.Name</title>
+    <link rel="stylesheet" href="~/css/repositories.css" />
+</head>
+<body>
+    <div class="center-div">
+        <div class="repo-details">
+            <a href="@Model.Url" target="_blank">
+                <div>
+                    <h4 class="d-inline">Language: <b><span>@Model.Language</span></b></h4>
+                </div>
+                <h4>Description:</h4>
+                <p>@Model.Description</p>
+                <h4>Last Updated:</h4>
+                <p>@Model.LastUpdated.ToString("dd/MM/yyyy hh:mm")</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

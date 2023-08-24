@@ -1,0 +1,57 @@
+﻿@using System.Text.Json
+@model GithubViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Repositories</title>
+    <link rel="stylesheet" href="~/css/repositories.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/js/myRepositories.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.likeButton').click(function () {
+                $(this).toggleClass('liked');
+                this.innerText = this.innerText === "LIKE" ? "DESLIKE" : "LIKE";
+                var repo = $(this).data('repo');
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("Like", "MyRepositories")',
+                    data: { repoName: repo },
+                    success: function (data) {
+                        console.log(repo);
+                    },
+                    error: function (error) {
+                        console.error(error);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="center-div">
+        <h1 class="display-4">@Model.UserName.ToUpper()</h1>
+        <input id="repositoryNameInput" type="text" oninput="handleRepositoryNameInput()" value="Search for repository by name" />
+        <ul>
+            @foreach (var repo in Model.Repositories)
+            {
+                <li data-repo-name="@repo.Name" class="repo-item">
+                    <div class="repo-container">
+                        <div class="flex-row">
+                            <a asp-controller="RepositoryDetail" asp-action="Index" asp-route-name="@repo.Name">
+                                <h2>@repo.Name</h2>
+                            </a>
+                            @{
+                                string buttonClass = ViewBag.favorites.Contains(repo.Name) ? "likeButton liked" : "likeButton";
+                                string buttonName = ViewBag.favorites.Contains(repo.Name) ? "DESLIKE" : "LIKE";
+                            }
+                            <button class="@buttonClass" data-repo="@repo.Name">@buttonName</button>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</body>
+</html>
